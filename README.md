@@ -15,3 +15,26 @@ Dobrý den, moje jméno je David Vangárd a jmenuji se David Vangárd a mám tad
     <p>
         Následný výstup bude .csv soubor s výsledky pro vybraný okres :3
     </p>
+
+<h2>Praxe</h2>
+    <p>
+        Např. pro okres Nymburk </bl> 
+        <ol>
+            <li>
+                Odkaz: <a href="https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108">https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108</a>
+            </li>
+            <li>
+                Nazev výstupního souboru: vysledky_kolin.csv
+            </li>
+            <li>
+                Spoštění skriptu: </bl>
+                python projekt_3.py "https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108" vysledky_kolin.csv
+            </li>
+            <li>
+                Začne probíhat průběh programu
+            </li>
+            <li>
+                Následný výstup bude: <a href="https://github.com/Zajic31/Volby_17/blob/main/vysledky_nymburk.csv">vysledky_nymburk.csv</a>
+            </li>
+        </ol>
+    </p>
