@@ -16,7 +16,7 @@ Dobrý den, moje jméno je David Vangárd a jmenuji se David Vangárd a mám tad
         Následný výstup bude .csv soubor s výsledky pro vybraný okres :3
     </p>
 
-<h2>Praxe</h2>
+<h2><b>Praxe</b></h2>
     <p>
         Např. pro okres Nymburk </bl> 
         <ol>
