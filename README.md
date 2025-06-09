@@ -24,7 +24,7 @@ Dobrý den, moje jméno je David Vangárd a jmenuji se David Vangárd a mám tad
                 Odkaz: <a href="https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108">https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108</a>
             </li>
             <li>
-                Nazev výstupního souboru: vysledky_kolin.csv
+                Nazev výstupního souboru: vysledky_nymburk.csv
             </li>
             <li>
                 Spoštění skriptu: </bl>
