@@ -9,8 +9,8 @@ Dobrý den, moje jméno je David Vangárd a jmenuji se David Vangárd a mám tad
     
 <h2><b>How to sputit</b></h2>
     <p>
-        Před spuštěním samotného skriptu si musíte stáhnout potřebné knihovny uvedené v souboru <a href="https://github.com/Zajic31/Volby_17/blob/main/requirements.txt"> requirements.txt</a>. Samotný kód následně spustíte z Terminálu pomocí tohoto příkazu: 
-        python projekt_3.py "odkaz-okresu" "nazev-vystupniho-souboru.csv"
+        Před spuštěním samotného skriptu si musíte stáhnout potřebné knihovny uvedené v souboru <a href="https://github.com/Zajic31/Volby_17/blob/main/requirements.txt"> requirements.txt</a>. Samotný kód následně spustíte z Terminálu pomocí tohoto příkazu:</p><bl> 
+        <ul>python projekt_3.py "odkaz-okresu" "nazev-vystupniho-souboru.csv"</ul>
     </p>
     <p>
         Následný výstup bude .csv soubor s výsledky pro vybraný okres :3
