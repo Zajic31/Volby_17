@@ -2,7 +2,7 @@
 
 Dobrý den, moje jméno je David Vangárd a jmenuji se David Vangárd a mám tady tenhle Python projekt a dnes vám ukážu co s ním všchno umím...</bl>
 
-Moje upřímná reakce po tom co nemám za 5 (snad): <img src="[https://i.pinimg.com/originals/6e/e2/3d/6ee23da15b437dd6cc229c45a73afb9d.gif](https://t4.ftcdn.net/jpg/02/25/43/37/360_F_225433780_adJUNaMFOgZDEY2lELYXAqfj4jCX7dBX.jpg)">
+Moje upřímná reakce po tom co nemám za 5 (snad): <img src="https://t4.ftcdn.net/jpg/02/25/43/37/360_F_225433780_adJUNaMFOgZDEY2lELYXAqfj4jCX7dBX.jpg">
 
 <h2><b>Co je to za projekt?</b></h2>
     <p>
