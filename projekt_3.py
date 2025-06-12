@@ -1,16 +1,8 @@
-"""
-projekt_3.py: Volby 2017
-
-author: David Zajíček
-email: davidzajicek07@gmail.com
-"""
-
 import sys
 import csv
 import requests
 from bs4 import BeautifulSoup
 
-# Požadované strany podle zadání
 POZADOVANE_STRANY = {
     "Občanská demokratická strana": "ODS",
     "Česká str.sociálně demokrat.": "ČSSD",
@@ -18,60 +10,59 @@ POZADOVANE_STRANY = {
     "ANO 2011": "ANO 2011",
     "Svob.a př.dem.-T.Okamura (SPD)": "SPD",
     "Česká pirátská strana": "Piráti",
-    "CESTA ODPOVĚDNÉ SPOLEČNOSTI" : "COS",
-    "Radostné Česko" : "Rado. Č.",
-    "STAROSTOVÉ A NEZÁVISLÍ" : "STAN",
-    "Strana zelených" : "Zelený",
-    "ROZUMNÍ-stop migraci,diktát.EU" : "ROZUMNÍ",
-    "Strana svobodných občanů" : "SSO",
-    "Blok proti islam.-Obran.domova" : "BPI",
-    "Občanská demokratická aliance" : "ODA",
-    "Referendum o Evropské unii" : "EU referendum",
-    "TOP 09" : "TOP 09",
-    "Dobrá volba 2016" : "DB 2016",
-    "SPR-Republ.str.Čsl. M.Sládka" : "SPR",
-    "Křesť.demokr.unie-Čs.str.lid." : "Křesťaní",
-    "Česká strana národně sociální" : "ČSNS",
-    "REALISTÉ" : "REALIST",
-    "SPORTOVCI" : "SPORT",
-    "Dělnic.str.sociální spravedl." : "DSSS",
-    "Strana Práv Občanů" : "SPO"
-
+    "CESTA ODPOVĚDNÉ SPOLEČNOSTI": "COS",
+    "Radostné Česko": "Rado. Č.",
+    "STAROSTOVÉ A NEZÁVISLÍ": "STAN",
+    "Strana zelených": "Zelený",
+    "ROZUMNÍ-stop migraci,diktát.EU": "ROZUMNÍ",
+    "Strana svobodných občanů": "SSO",
+    "Blok proti islam.-Obran.domova": "BPI",
+    "Občanská demokratická aliance": "ODA",
+    "Referendum o Evropské unii": "EU referendum",
+    "TOP 09": "TOP 09",
+    "Dobrá volba 2016": "DB 2016",
+    "SPR-Republ.str.Čsl. M.Sládka": "SPR",
+    "Křesť.demokr.unie-Čs.str.lid.": "Křesťaní",
+    "Česká strana národně sociální": "ČSNS",
+    "REALISTÉ": "REALIST",
+    "SPORTOVCI": "SPORT",
+    "Dělnic.str.sociální spravedl.": "DSSS",
+    "Strana Práv Občanů": "SPO"
 }
 
 
-def get_obec_urls(main_url):
+def get_obce_info(main_url):
     base = "https://volby.cz/pls/ps2017nss/"
     r = requests.get(main_url)
     soup = BeautifulSoup(r.text, "html.parser")
-    links = soup.select("td.cislo a")
-    urls = [base + a["href"] for a in links]
-    return urls
+    rows = soup.select("tr")
+
+    obce = []
+    for row in rows:
+        cislo = row.select_one("td.cislo a")
+        nazev = row.select_one("td.overflow_name")
+
+        if cislo and nazev:
+            kod_obce = cislo.text.strip()
+            nazev_obce = nazev.text.strip()
+            href = cislo["href"]
+            url = base + href
+            obce.append((kod_obce, nazev_obce, url))
+    return obce
 
 
 def parse_obec(url):
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Základní info
-    # Kód obce a název – vezmeme z první tabulky
-    tabulka = soup.select("table")[0]
-    radek = tabulka.select("tr")[2]  # třetí řádek tabulky (index 2)
-    sloupce = radek.select("td")
-
-    kod_obce = sloupce[0].text.strip()
-    nazev_obce = sloupce[1].text.strip()
-
     volici = soup.find("td", headers="sa2").text.strip().replace("\xa0", "")
     obalky = soup.find("td", headers="sa3").text.strip().replace("\xa0", "")
     platne = soup.find("td", headers="sa6").text.strip().replace("\xa0", "")
 
-    # Strany a hlasy
     strany = soup.find_all("td", class_="overflow_name")
     hlasy = soup.find_all("td", headers=lambda h: h and "t1sa2" in h)
 
     vysledky = {zkr: "0" for zkr in POZADOVANE_STRANY.values()}
-
     for s, h in zip(strany, hlasy):
         nazev = s.text.strip()
         if nazev in POZADOVANE_STRANY:
@@ -79,7 +70,7 @@ def parse_obec(url):
             pocet = h.text.strip().replace("\xa0", "")
             vysledky[zkr] = pocet
 
-    return [kod_obce, nazev_obce, volici, obalky, platne] + [vysledky[zkr] for zkr in ["ODS", "ČSSD", "KSČM", "ANO 2011", "SPD", "Piráti", "COS",  "Rado. Č.", "STAN", "Zelený", "ROZUMNÍ","SSO","BPI","ODA","EU referendum","TOP 09", "DB 2016", "SPR","Křesťaní", "ČSNS","REALIST","SPORT","DSSS","SPO"]]
+    return volici, obalky, platne, vysledky
 
 
 def main():
@@ -90,23 +81,25 @@ def main():
     input_url = sys.argv[1]
     output_csv = sys.argv[2]
 
-    print("Stahuji seznam obcí...")
-    urls = get_obec_urls(input_url)
-    print(f"Počet obcí: {len(urls)}")
+    print("Stahuju more seznam obcí more...")
+    obce = get_obce_info(input_url)
+    print(f"Nalezeno obcí: {len(obce)}")
 
-    data = []
-    for url in urls:
-        radek = parse_obec(url)
-        data.append(radek)
+    poradi = list(POZADOVANE_STRANY.values())
+    vysledky_csv = []
 
-    print("Ukládám do CSV...")
+    for kod, nazev, url in obce:
+        volici, obalky, platne, hlasy = parse_obec(url)
+        radek = [kod, nazev, volici, obalky, platne] + [hlasy[zkr] for zkr in poradi]
+        vysledky_csv.append(radek)
+
     with open(output_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        hlavicka = ["kód obce", "název obce", "voliči v seznamu", "vydané obálky", "platné hlasy", "ODS", "ČSSD", "KSČM", "ANO 2011", "SPD", "Piráti", "COS",  "Rado. Č.", "STAN", "Zelený", "ROZUMNÍ","SSO","BPI","ODA","EU referendum","TOP 09", "DB 2016", "SPR","Křesťaní", "ČSNS","REALIST","SPORT","DSSS","SPO"]
+        hlavicka = ["kód obce", "název obce", "voliči v seznamu", "vydané obálky", "platné hlasy"] + poradi
         writer.writerow(hlavicka)
-        writer.writerows(data)
+        writer.writerows(vysledky_csv)
 
-    print(f" Výsledek: {output_csv}")
+    print(f"Výsledky: {output_csv}")
 
 
 if __name__ == "__main__":
