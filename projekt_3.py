@@ -1,70 +1,113 @@
 """
 projekt_3.py: Volby 2017
 
-author: David Zajicek
+author: David Zajíček
 email: davidzajicek07@gmail.com
-discord: idk
 """
 
-import requests
-from bs4 import (BeautifulSoup)
-import csv
 import sys
+import csv
+import requests
+from bs4 import BeautifulSoup
 
-# Zpracování argumentů
-if len(sys.argv) != 3:
-    print("Chyba: Zadej 2 argumenty – URL a název výstupního souboru (.csv)")
-    exit()
+# Požadované strany podle zadání
+POZADOVANE_STRANY = {
+    "Občanská demokratická strana": "ODS",
+    "Česká str.sociálně demokrat.": "ČSSD",
+    "Komunistická str.Čech a Moravy": "KSČM",
+    "ANO 2011": "ANO 2011",
+    "Svob.a př.dem.-T.Okamura (SPD)": "SPD",
+    "Česká pirátská strana": "Piráti",
+    "CESTA ODPOVĚDNÉ SPOLEČNOSTI" : "COS",
+    "Radostné Česko" : "Rado. Č.",
+    "STAROSTOVÉ A NEZÁVISLÍ" : "STAN",
+    "Strana zelených" : "Zelený",
+    "ROZUMNÍ-stop migraci,diktát.EU" : "ROZUMNÍ",
+    "Strana svobodných občanů" : "SSO",
+    "Blok proti islam.-Obran.domova" : "BPI",
+    "Občanská demokratická aliance" : "ODA",
+    "Referendum o Evropské unii" : "EU referendum",
+    "TOP 09" : "TOP 09",
+    "Dobrá volba 2016" : "DB 2016",
+    "SPR-Republ.str.Čsl. M.Sládka" : "SPR",
+    "Křesť.demokr.unie-Čs.str.lid." : "Křesťaní",
+    "Česká strana národně sociální" : "ČSNS",
+    "REALISTÉ" : "REALIST",
+    "SPORTOVCI" : "SPORT",
+    "Dělnic.str.sociální spravedl." : "DSSS",
+    "Strana Práv Občanů" : "SPO"
 
-input_url = sys.argv[1]
-output_csv = sys.argv[2]
+}
 
-# Získání HTML stránky
-response = requests.get(input_url)
-soup = BeautifulSoup(response.text, 'html.parser')
 
-# Najdi odkazy na jednotlivé obce
-base_url = "https://volby.cz/pls/ps2017nss/"
-obec_links = soup.find_all("a")
-urls = [base_url + a["href"] for a in obec_links if "href" in a.attrs and "obec" in a["href"]]
+def get_obec_urls(main_url):
+    base = "https://volby.cz/pls/ps2017nss/"
+    r = requests.get(main_url)
+    soup = BeautifulSoup(r.text, "html.parser")
+    links = soup.select("td.cislo a")
+    urls = [base + a["href"] for a in links]
+    return urls
 
-# Připravíme CSV
-with open(output_csv, mode="w", newline="", encoding="utf-8") as file:
-    writer = csv.writer(file)
-    writer.writerow([
-        "kód obce", "název obce", "voliči v seznamu", "vydané obálky", "platné hlasy",
-        "Občanská demokratická strana", "Česká str.sociálně demokrat.", "Komunistická str.Čech a Moravy",
-        "ANO 2011", "SPD", "Piráti"
-    ])
 
-    # Projdeme každou obec
+def parse_obec(url):
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    # Základní info
+    # Kód obce a název – vezmeme z první tabulky
+    tabulka = soup.select("table")[0]
+    radek = tabulka.select("tr")[2]  # třetí řádek tabulky (index 2)
+    sloupce = radek.select("td")
+
+    kod_obce = sloupce[0].text.strip()
+    nazev_obce = sloupce[1].text.strip()
+
+    volici = soup.find("td", headers="sa2").text.strip().replace("\xa0", "")
+    obalky = soup.find("td", headers="sa3").text.strip().replace("\xa0", "")
+    platne = soup.find("td", headers="sa6").text.strip().replace("\xa0", "")
+
+    # Strany a hlasy
+    strany = soup.find_all("td", class_="overflow_name")
+    hlasy = soup.find_all("td", headers=lambda h: h and "t1sa2" in h)
+
+    vysledky = {zkr: "0" for zkr in POZADOVANE_STRANY.values()}
+
+    for s, h in zip(strany, hlasy):
+        nazev = s.text.strip()
+        if nazev in POZADOVANE_STRANY:
+            zkr = POZADOVANE_STRANY[nazev]
+            pocet = h.text.strip().replace("\xa0", "")
+            vysledky[zkr] = pocet
+
+    return [kod_obce, nazev_obce, volici, obalky, platne] + [vysledky[zkr] for zkr in ["ODS", "ČSSD", "KSČM", "ANO 2011", "SPD", "Piráti", "COS",  "Rado. Č.", "STAN", "Zelený", "ROZUMNÍ","SSO","BPI","ODA","EU referendum","TOP 09", "DB 2016", "SPR","Křesťaní", "ČSNS","REALIST","SPORT","DSSS","SPO"]]
+
+
+def main():
+    if len(sys.argv) != 3:
+        print("Použití: python projekt_3.py <URL> <výstupní_soubor.csv>")
+        exit(1)
+
+    input_url = sys.argv[1]
+    output_csv = sys.argv[2]
+
+    print("Stahuji seznam obcí...")
+    urls = get_obec_urls(input_url)
+    print(f"Počet obcí: {len(urls)}")
+
+    data = []
     for url in urls:
-        res = requests.get(url)
-        bs = BeautifulSoup(res.text, "html.parser")
+        radek = parse_obec(url)
+        data.append(radek)
 
-        # Kód a název obce
-        kod_obce = bs.select_one("h3").text.split(":")[0].split(" ")[-1]
-        nazev_obce = bs.select_one("h3").text.split(":")[1].strip()
+    print("Ukládám do CSV...")
+    with open(output_csv, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        hlavicka = ["kód obce", "název obce", "voliči v seznamu", "vydané obálky", "platné hlasy", "ODS", "ČSSD", "KSČM", "ANO 2011", "SPD", "Piráti", "COS",  "Rado. Č.", "STAN", "Zelený", "ROZUMNÍ","SSO","BPI","ODA","EU referendum","TOP 09", "DB 2016", "SPR","Křesťaní", "ČSNS","REALIST","SPORT","DSSS","SPO"]
+        writer.writerow(hlavicka)
+        writer.writerows(data)
 
-        # Základní čísla
-        tds = bs.find_all("td", headers=["sa2", "sa3", "sa6"])
-        volici = tds[0].text.replace("\xa0", "")
-        obalky = tds[1].text.replace("\xa0", "")
-        platne = tds[2].text.replace("\xa0", "")
+    print(f" Výsledek: {output_csv}")
 
-        # Hlasy pro vybrané strany
-        strany = ["Občanská demokratická strana", "Česká str.sociálně demokrat.",
-                  "Komunistická str.Čech a Moravy", "ANO 2011", "SPD", "Piráti"]
-        hlasu = []
 
-        for strana in strany:
-            td = bs.find("td", string=strana)
-            if td:
-                hlas = td.find_next_sibling("td").text.replace("\xa0", "")
-            else:
-                hlas = "0"
-            hlasu.append(hlas)
-
-        writer.writerow([kod_obce, nazev_obce, volici, obalky, platne] + hlasu)
-
-print(f"Hotovo! Výsledky uloženy do {output_csv}")
+if __name__ == "__main__":
+    main()
