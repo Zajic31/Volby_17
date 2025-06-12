@@ -1,3 +1,10 @@
+"""
+projekt_3.py: Volby 2017
+
+author: David Zajíček
+email: davidzajicek07@gmail.com
+"""
+
 import sys
 import csv
 import requests
