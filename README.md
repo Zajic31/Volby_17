@@ -23,7 +23,7 @@ Moje upřímná reakce po tom co nemám za 5 (snad): <img src="https://t4.ftcdn.
         Např. pro okres Nymburk </bl> 
         <ol>
             <li>
-                Odkaz: <a href="https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108" target="_blank">https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108</a>
+                Odkaz: <a href="https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108">https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108</a>
             </li>
             <li>
                 Nazev výstupního souboru: vysledky_nymburk.csv
