@@ -1,8 +1,9 @@
 """
 projekt_3.py: Volby 2017
 
-author: David Zajíček
+autor: David Zajíček
 email: davidzajicek07@gmail.com
+discord: nvm
 """
 
 import sys
