@@ -30,7 +30,7 @@ Moje upřímná reakce po tom co nemám za 5 (snad): <img src="https://t4.ftcdn.
             </li>
             <li>
                 Spouštění skriptu: </bl>
-                python projekt_3.py "https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108" vysledky_kolin.csv
+                python projekt_3.py "https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2108" vysledky_nymburk.csv
             </li>
             <li>
                 Začne probíhat průběh programu
